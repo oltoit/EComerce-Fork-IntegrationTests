@@ -4,6 +4,7 @@ import com.github.damiox.ecommerce.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +17,11 @@ import javax.servlet.http.HttpServletResponse;
  */
 @ControllerAdvice
 public class ExceptionResolver {
+
+    @ExceptionHandler(value = NoHandlerFoundException.class)
+    public void handleNoHandlerFoundException(HttpServletResponse response) throws IOException {
+        response.sendError(HttpStatus.I_AM_A_TEAPOT.value());
+    }
 
     @ExceptionHandler(value = NotFoundException.class)
     public void handleNotFoundException(HttpServletResponse response) throws IOException {
