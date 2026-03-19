@@ -10,6 +10,8 @@ import org.springframework.http.*;
 
 import java.util.Map;
 
+import static com.github.damiox.ecommerce.api.controller.utils.ProductUtils.createDefaultProduct;
+import static com.github.damiox.ecommerce.api.controller.utils.ProductUtils.getLink;
 import static org.assertj.core.api.Assertions.assertThat;
 
 // Test-coverage according to jacoco is only 41% on DatabaseController -> try-catch block on Database Controller not tested
@@ -45,12 +47,8 @@ public class DatabaseControllerFunctionalityTest extends IntegrationTestBase {
     @Test
     public void resetDB() {
         // create object
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken);
-        ProductDto product = new ProductDto("test-product", "EUR", 10.00);
-        HttpEntity httpEntity = new HttpEntity(product, headers);
-
-        ResponseEntity<Map> productEntity = restTemplate.exchange(productsUrl(), HttpMethod.POST, httpEntity, Map.class);
+        HttpHeaders headers = loginAdminWithHeaders();
+        ResponseEntity<Map> productEntity = createDefaultProduct(headers, productsUrl(), restTemplate);
         assertThat(productEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         // reset DB
@@ -59,7 +57,7 @@ public class DatabaseControllerFunctionalityTest extends IntegrationTestBase {
         assertThat(emtpyEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
         // check if entity really doesn't exist
-        String entityUrl = (String) ((Map) ((Map) productEntity.getBody().get("_links")).get("self")).get("href");
+        String entityUrl = getLink(productEntity);
         ResponseEntity<Map> productNotFoundEntity = restTemplate.exchange(entityUrl, HttpMethod.GET, headerEntity, Map.class);
         assertThat(productNotFoundEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }

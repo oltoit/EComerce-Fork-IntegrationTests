@@ -65,6 +65,10 @@ public abstract class IntegrationTestBase {
         return url("/products");
     }
 
+    protected String productUrl(int index) {
+        return productsUrl() + "/" + index;
+    }
+
     protected String loginAdmin() {
         CredentialsDto credentials = new CredentialsDto("admin", "admin");
         return login(credentials);
@@ -78,5 +82,22 @@ public abstract class IntegrationTestBase {
     protected String login(CredentialsDto credentials) {
         Map<String, String> response = restTemplate.postForObject(loginUrl(), credentials, Map.class);
         return response.get("token").replace("Bearer ", "");
+    }
+
+    protected HttpHeaders loginAdminWithHeaders() {
+        CredentialsDto credentials = new CredentialsDto("admin", "admin");
+        return loginWithHeaders(credentials);
+    }
+
+    protected HttpHeaders loginUserWithHeaders() {
+        CredentialsDto credentials = new CredentialsDto("user1", "user1");
+        return loginWithHeaders(credentials);
+    }
+
+    protected HttpHeaders loginWithHeaders(CredentialsDto credentials) {
+        Map<String, String> response = restTemplate.postForObject(loginUrl(), credentials, Map.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, response.get("token"));
+        return headers;
     }
 }
