@@ -3,6 +3,7 @@ package com.github.damiox.ecommerce.api.controller.objects;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Objects;
 
 public class ProductDto {
     @NotNull(message = "name is required")
@@ -39,9 +40,21 @@ public class ProductDto {
         this.price = price;
     }
 
+    public ProductDto() {}
+
     public ProductDto(String name, String currency, double price) {
         this.name = name;
         this.currency = currency;
         this.price = price;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(this == o) {return true;}
+        if(o == null || getClass() != o.getClass()) {return false;}
+        ProductDto that = (ProductDto) o;
+        return Objects.equals(name, that.name) &&
+                Objects.equals(currency, that.currency) &&
+                Objects.equals(price, that.price);
     }
 }

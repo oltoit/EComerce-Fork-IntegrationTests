@@ -1,5 +1,7 @@
 package com.github.damiox.ecommerce.api.controller;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.damiox.ecommerce.api.controller.objects.CredentialsDto;
 import org.junit.After;
 import org.junit.Before;
@@ -22,6 +24,7 @@ public abstract class IntegrationTestBase {
     private int port;
 
     protected RestTemplate restTemplate;
+    protected ObjectMapper mapper;
 
     @Before
     public void setUp() {
@@ -32,6 +35,8 @@ public abstract class IntegrationTestBase {
                 return false;
             }
         });
+        mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     // LOG entries are colored in cyan so they can be distinguished from other LOG entries
