@@ -79,6 +79,11 @@ public abstract class IntegrationTestBase {
         return login(credentials);
     }
 
+    protected String loginUser2() {
+        CredentialsDto credentials = new CredentialsDto("user2", "user2");
+        return login(credentials);
+    }
+
     protected String login(CredentialsDto credentials) {
         Map<String, String> response = restTemplate.postForObject(loginUrl(), credentials, Map.class);
         return response.get("token").replace("Bearer ", "");
@@ -91,6 +96,11 @@ public abstract class IntegrationTestBase {
 
     protected HttpHeaders loginUserWithHeaders() {
         CredentialsDto credentials = new CredentialsDto("user1", "user1");
+        return loginWithHeaders(credentials);
+    }
+
+    protected HttpHeaders loginUser2WithHeaders() {
+        CredentialsDto credentials = new CredentialsDto("user2", "user2");
         return loginWithHeaders(credentials);
     }
 
