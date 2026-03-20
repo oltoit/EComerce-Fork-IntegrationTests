@@ -4,7 +4,7 @@ create table if not exists app_user (
     password varchar(100) not null,
     role varchar(10) not null,
     primary key (id),
-    unique key username (username)
+    constraint username unique (username)
 );
 
 create table if not exists app_category (
@@ -18,7 +18,7 @@ create table if not exists app_category (
 create table if not exists app_product (
     id bigint,
     name varchar(300) not null,
-    price double not null,
+    price double precision not null,
     userid bigint not null,
     primary key (id),
     foreign key (userid) references app_user(id)
