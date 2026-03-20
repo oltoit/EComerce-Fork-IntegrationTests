@@ -10,8 +10,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class ProductUtils {
 
     public static String getLink(ResponseEntity<Map> product) {

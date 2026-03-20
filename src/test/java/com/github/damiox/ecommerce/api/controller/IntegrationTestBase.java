@@ -74,6 +74,15 @@ public abstract class IntegrationTestBase {
         return productsUrl() + "/" + index;
     }
 
+    protected String categoriesUrl() {
+        return url("/categories");
+    }
+
+    protected String categoryUrl(int index) {
+        return categoriesUrl() + "/" + index;
+    }
+
+
     protected String loginAdmin() {
         CredentialsDto credentials = new CredentialsDto("admin", "admin");
         return login(credentials);
