@@ -43,4 +43,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query(value = COUNT_PRODUCTS_ASSOCIATED_WITH_CATEGORY_SQL, nativeQuery = true)
     Long countByAssociatedWithCategory(Long categoryId);
 
+    Product getProductsById(Long id);
 }
