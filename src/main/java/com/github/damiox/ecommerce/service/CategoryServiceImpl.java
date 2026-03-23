@@ -64,6 +64,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     @Override
     public boolean isChildCategory(Category category, Category parent) {
+        if (category.getParent() == null) return false;
         return category.getParent().equals(parent);
     }
 
