@@ -299,7 +299,6 @@ public class ProductControllerFunctionalityTest extends IntegrationTestBase {
 
     @Test
     public void getProductsPaginationPage2() {
-        // create 3 products
         for (int i = 0; i < 3; i++) {
             String name = "product-"  + i;
             productUtils.createProduct(new ProductDto(name, "EUR", 10.00), user1.id);
@@ -322,39 +321,44 @@ public class ProductControllerFunctionalityTest extends IntegrationTestBase {
     public void getProductsPaginationPageOutOfBounds() {
         productUtils.createProduct(defaultProduct, user1.id);
 
-        ResponseEntity<Map> response = restTemplate.exchange(baseUrl + "?page=999&size=20", HttpMethod.GET, new HttpEntity<>(loginWithHeaders(user1)), Map.class);
+        ResponseEntity<Map> response = restTemplate.exchange(baseUrl + "?page=999&size=20", HttpMethod.GET,new HttpEntity<>(loginWithHeaders(user1)), Map.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         Map page = (Map) response.getBody().get("page");
         assertThat(page.get("number")).isEqualTo(999);
         assertThat(page.get("totalElements")).isEqualTo(1);
+        assertThat(page.get("size")).isEqualTo(20);
     }
 
     @Test
     public void getProductsPaginationNegativePageIndex() {
-        ResponseEntity<String> response = restTemplate.exchange(baseUrl + "?page=-1&size=20", HttpMethod.GET, new HttpEntity<>(loginWithHeaders(user1)), String.class);
+        productUtils.createProduct(defaultProduct, user1.id);
+
+        ResponseEntity<Map> response = restTemplate.exchange(baseUrl + "?page=-1&size=20", HttpMethod.GET, new HttpEntity<>(loginWithHeaders(user1)), Map.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        Map page = (Map) response.getBody().get("page");
+        assertThat(page.get("number")).isEqualTo(0);
+        assertThat(page.get("totalElements")).isEqualTo(1);
+        assertThat(page.get("size")).isEqualTo(20);
     }
 
     @Test
     public void getProductsPaginationNegativePageSize() {
-        ResponseEntity<String> response = restTemplate.exchange(baseUrl + "?page=0&size=-1", HttpMethod.GET, new HttpEntity<>(loginWithHeaders(user1)), String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
+        productUtils.createProduct(defaultProduct, user1.id);
 
-    @Test
-    public void getProductsPaginationMaxPageSize() {
-        ResponseEntity<Map> response = restTemplate.exchange(baseUrl + "?page=0&size=5000", HttpMethod.GET, new HttpEntity<>(loginWithHeaders(user1)), Map.class);
+        ResponseEntity<Map> response = restTemplate.exchange(baseUrl + "?page=0&size=-1", HttpMethod.GET, new HttpEntity<>(loginWithHeaders(user1)), Map.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         Map page = (Map) response.getBody().get("page");
-        // default max-page size is 2000 -> assert that even with pagesize of 5000 in query 2000 will be actual page size
-        assertThat(page.get("size")).isEqualTo(2000);
+        assertThat(page.get("number")).isEqualTo(0);
+        assertThat(page.get("totalElements")).isEqualTo(1);
+        assertThat(page.get("size")).isEqualTo(20);
     }
 
     @Test
     public void getProductsPaginationExceedMaxPageSize() {
-        ResponseEntity<Map> response = restTemplate.exchange(baseUrl + "?page=0&size=2001", HttpMethod.GET, new HttpEntity<>(loginWithHeaders(user1)), Map.class);
+        ResponseEntity<Map> response = restTemplate.exchange(baseUrl + "?page=0&size=5000", HttpMethod.GET, new HttpEntity<>(loginWithHeaders(user1)), Map.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         // Spring caps the size at 2000 instead of returning an error

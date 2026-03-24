@@ -101,6 +101,10 @@ public abstract class IntegrationTestBase {
         return subcategoriesUrl(parentId) + "/" + childId;
     }
 
+    protected String categoryProductsUrl(long categoryId) {
+        return categoriesUrl() + "/" + categoryId + "/products";
+    }
+
     protected String login(User user) {
         CredentialsDto credentials = new CredentialsDto(user.name, user.password);
         Map<String, String> response = restTemplate.postForObject(loginUrl(), credentials, Map.class);

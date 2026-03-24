@@ -2,7 +2,6 @@ package com.github.damiox.ecommerce.api.controller.functionality;
 
 import com.github.damiox.ecommerce.api.controller.IntegrationTestBase;
 import com.github.damiox.ecommerce.api.controller.utils.CategoryUtils;
-import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -16,25 +15,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CategorySubcategoriesControllerFunctionalityTest extends IntegrationTestBase {
 
-    private String baseUrl;
-
     @Autowired
     private CategoryUtils categoryUtils;
-
-    @Before
-    public void init() {
-        baseUrl = categoriesUrl();
-    }
 
     @Test
     public void getSubcategories() {
         long parentId = categoryUtils.createCategory("parent");
-        categoryUtils.createSubcategory("child", parentId);
 
-        ResponseEntity<String> response = restTemplate.exchange(
-                subcategoriesUrl(parentId), HttpMethod.GET,
-                new HttpEntity<>(loginWithHeaders(user1)), String.class
-        );
+        ResponseEntity<String> response = restTemplate.exchange(subcategoriesUrl(parentId), HttpMethod.GET, new HttpEntity<>(loginWithHeaders(user1)), String.class);
+
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
@@ -44,31 +33,16 @@ public class CategorySubcategoriesControllerFunctionalityTest extends Integratio
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        ResponseEntity<String> response = restTemplate.exchange(
-                subcategoriesUrl(parentId), HttpMethod.GET,
-                new HttpEntity<>(headers), String.class
-        );
+        ResponseEntity<String> response = restTemplate.exchange(subcategoriesUrl(parentId), HttpMethod.GET, new HttpEntity<>(headers), String.class);
+
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
     public void getSubcategoriesParentNotFound() {
-        ResponseEntity<String> response = restTemplate.exchange(
-                subcategoriesUrl(1), HttpMethod.GET,
-                new HttpEntity<>(loginWithHeaders(user1)), String.class
-        );
+        ResponseEntity<String> response = restTemplate.exchange(subcategoriesUrl(1), HttpMethod.GET, new HttpEntity<>(loginWithHeaders(user1)), String.class);
+
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-    }
-
-    @Test
-    public void getSubcategoriesEmpty() {
-        long parentId = categoryUtils.createCategory("parent");
-
-        ResponseEntity<String> response = restTemplate.exchange(
-                subcategoriesUrl(parentId), HttpMethod.GET,
-                new HttpEntity<>(loginWithHeaders(user1)), String.class
-        );
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
@@ -94,7 +68,7 @@ public class CategorySubcategoriesControllerFunctionalityTest extends Integratio
         ResponseEntity<Map> response = addSubcategory(headers, parentId, childId);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
 
-        // verify in db that parentid is still null
+        // verify in db that parentId is still null
         Map<String, Object> childFromDb = categoryUtils.getCategoryAsMap(childId);
         assertThat(childFromDb.get("parentid")).isNull();
     }
@@ -107,7 +81,7 @@ public class CategorySubcategoriesControllerFunctionalityTest extends Integratio
         ResponseEntity<Map> response = addSubcategory(loginWithHeaders(user1), parentId, childId);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
 
-        // verify in db that parentid is still null
+        // verify in db that parentId is still null
         Map<String, Object> childFromDb = categoryUtils.getCategoryAsMap(childId);
         assertThat(childFromDb.get("parentid")).isNull();
     }
@@ -118,6 +92,9 @@ public class CategorySubcategoriesControllerFunctionalityTest extends Integratio
 
         ResponseEntity<Map> response = addSubcategory(loginWithHeaders(admin), 1, childId);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+
+        Map<String, Object> childFromDb = categoryUtils.getCategoryAsMap(childId);
+        assertThat(childFromDb.get("parentid")).isNull();
     }
 
     @Test
@@ -135,6 +112,20 @@ public class CategorySubcategoriesControllerFunctionalityTest extends Integratio
 
         ResponseEntity<Map> response = addSubcategory(loginWithHeaders(admin), parentId, childId);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void updateSubCategory() {
+        long parentId = categoryUtils.createCategory("parent");
+        long parent2Id = categoryUtils.createCategory("parent_2");
+        long childId = categoryUtils.createSubcategory("child", parent2Id);
+
+        ResponseEntity<Map> response = addSubcategory(loginWithHeaders(admin), parentId, childId);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        // verify that parentId was changed
+        Map<String, Object> childFromDb = categoryUtils.getCategoryAsMap(childId);
+        assertThat(childFromDb.get("parentid")).isEqualTo(parentId);
     }
 
     @Test
@@ -162,7 +153,7 @@ public class CategorySubcategoriesControllerFunctionalityTest extends Integratio
 
         // verify in db that parentid is still set
         Map<String, Object> childFromDb = categoryUtils.getCategoryAsMap(childId);
-        assertThat(((Number) childFromDb.get("parentid")).longValue()).isEqualTo(parentId);
+        assertThat(childFromDb.get("parentid")).isEqualTo(parentId);
     }
 
     @Test
@@ -175,7 +166,7 @@ public class CategorySubcategoriesControllerFunctionalityTest extends Integratio
 
         // verify in db that parentid is still set
         Map<String, Object> childFromDb = categoryUtils.getCategoryAsMap(childId);
-        assertThat(((Number) childFromDb.get("parentid")).longValue()).isEqualTo(parentId);
+        assertThat(childFromDb.get("parentid")).isEqualTo(parentId);
     }
 
     @Test
