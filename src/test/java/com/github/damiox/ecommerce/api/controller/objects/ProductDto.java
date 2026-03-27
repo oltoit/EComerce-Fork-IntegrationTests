@@ -1,7 +1,5 @@
 package com.github.damiox.ecommerce.api.controller.objects;
 
-import com.github.damiox.ecommerce.entity.Product;
-
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;

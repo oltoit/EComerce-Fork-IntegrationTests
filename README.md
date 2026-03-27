@@ -1,3 +1,3 @@
-# ECommerce App Fork
+# ECommerce Integration tests
 
-This fork was created and modified to add some features regarding testing for the whole project 
+These Tests were created to test my ECommerce Fork independent of their Spring-Context

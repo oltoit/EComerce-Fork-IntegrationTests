@@ -18,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 //    CategoryProductsResourceTest.class,
 //    AuthenticationResourceTest.class
 })
-// FIXME: integration-tests auslagern
 public class ResourceTestCoordinator {
     public final static long TARGET_PID = findTargetPid();
     public final static String TEST_DIR = createDir();

@@ -19,6 +19,7 @@ public class ResourceTrackerRule implements TestRule {
             @Override
             public void evaluate() throws Throwable {
                 for (int i = 0; i < repetitions; i++) {
+                    ResourceSampler.setIteration(i);
                     base.evaluate();
                 }
             }

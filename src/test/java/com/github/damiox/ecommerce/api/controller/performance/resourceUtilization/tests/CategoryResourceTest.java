@@ -28,7 +28,7 @@ public class CategoryResourceTest extends ResourceUtilizationIntegrationTestBase
         HttpEntity httpEntity = new HttpEntity(headers);
         String categoriesUrl = categoriesUrl();
 
-        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName());
+        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName(), 30);
         ResponseEntity<String> response = restTemplate.exchange(categoriesUrl, HttpMethod.GET, httpEntity, String.class);
         ResourceSampler.stop();
 
@@ -46,7 +46,7 @@ public class CategoryResourceTest extends ResourceUtilizationIntegrationTestBase
         HttpEntity httpEntity = new HttpEntity(headers);
         String categoriyUrl = categoryUrl((int) id);
 
-        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName());
+        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName(), 100);
         ResponseEntity<String> response = restTemplate.exchange(categoriyUrl, HttpMethod.GET, httpEntity, String.class);
         ResourceSampler.stop();
 
@@ -61,7 +61,7 @@ public class CategoryResourceTest extends ResourceUtilizationIntegrationTestBase
         HttpHeaders headers = loginWithHeaders(admin);
         HttpEntity httpEntity = new HttpEntity(category, headers);
 
-        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName());
+        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName(), 100);
         ResponseEntity<String> response =  restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, String.class);
         ResourceSampler.stop();
 
@@ -82,7 +82,7 @@ public class CategoryResourceTest extends ResourceUtilizationIntegrationTestBase
         HttpHeaders headers = loginWithHeaders(admin);
         HttpEntity httpEntity = new HttpEntity(category, headers);
 
-        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName());
+        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName(), 100);
         ResponseEntity<String> response =  restTemplate.exchange(baseUrl, HttpMethod.PUT, httpEntity, String.class);
         ResourceSampler.stop();
 
@@ -102,7 +102,7 @@ public class CategoryResourceTest extends ResourceUtilizationIntegrationTestBase
         HttpHeaders headers = loginWithHeaders(admin);
         HttpEntity httpEntity = new HttpEntity(headers);
 
-        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName());
+        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName(), 100);
         ResponseEntity<String> response = restTemplate.exchange(baseUrl, HttpMethod.DELETE, httpEntity, String.class);
         ResourceSampler.stop();
 
