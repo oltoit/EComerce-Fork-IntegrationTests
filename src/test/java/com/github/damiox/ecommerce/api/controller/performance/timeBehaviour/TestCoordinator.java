@@ -1,6 +1,9 @@
 package com.github.damiox.ecommerce.api.controller.performance.timeBehaviour;
 
 import com.github.damiox.ecommerce.api.controller.performance.timeBehaviour.tests.CategoryPerfTimeTest;
+import com.github.damiox.ecommerce.api.controller.performance.timeBehaviour.tests.CategoryProductsPerfTimeTest;
+import com.github.damiox.ecommerce.api.controller.performance.timeBehaviour.tests.CategorySubcategoriesPerfTimeTest;
+import com.github.damiox.ecommerce.api.controller.performance.timeBehaviour.tests.ProductPerfTimeTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -11,9 +14,9 @@ import java.time.format.DateTimeFormatter;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     CategoryPerfTimeTest.class,
-//    ProductPerfTimeTest.class,
-//    CategorySubcategoriesTimeTest.class,
-//    CategoryProductsTimeTest.class
+    ProductPerfTimeTest.class,
+    CategorySubcategoriesPerfTimeTest.class,
+    CategoryProductsPerfTimeTest.class,
 })
 public class TestCoordinator {
     public static final String CSV_PATH = createCsvPath();

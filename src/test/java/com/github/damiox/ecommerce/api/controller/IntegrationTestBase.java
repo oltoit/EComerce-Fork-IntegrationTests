@@ -6,14 +6,12 @@ import com.github.damiox.ecommerce.api.controller.objects.CredentialsDto;
 import com.github.damiox.ecommerce.api.controller.objects.ProductDto;
 import com.github.damiox.ecommerce.api.controller.objects.Role;
 import com.github.damiox.ecommerce.api.controller.objects.User;
-import com.github.damiox.ecommerce.api.controller.utils.AbstractDBAccess;
 import com.github.damiox.ecommerce.api.controller.utils.DBAccess;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.DefaultResponseErrorHandler;
@@ -23,10 +21,9 @@ import java.sql.SQLException;
 import java.util.Map;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 public abstract class IntegrationTestBase {
-    @LocalServerPort
-    private int port;
+    public final int port = 8080;
 
     protected RestTemplate restTemplate;
     protected ObjectMapper mapper;
@@ -39,7 +36,6 @@ public abstract class IntegrationTestBase {
     protected static User admin = new User("admin", "admin", Role.ADMIN, 3);
 
     protected static ProductDto defaultProduct = new ProductDto("test", "EUR", 10.00);
-
 
     @Before
     public void setUp() {

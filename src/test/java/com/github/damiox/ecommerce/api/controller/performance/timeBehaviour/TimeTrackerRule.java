@@ -5,7 +5,6 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -58,5 +57,4 @@ public class TimeTrackerRule implements TestRule {
         }
         Files.write(file.toPath(), lines);
     }
-
 }
