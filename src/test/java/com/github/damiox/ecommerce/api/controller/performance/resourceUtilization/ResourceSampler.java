@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.concurrent.TimeUnit;
 
 /// Class running in separate thread that measures resource utilization.
 /// measures cpu-utilization in % and ram-usage in MB.
@@ -36,20 +37,39 @@ public class ResourceSampler {
 
     public static void start(String testName, int hertz) {
         double rate = 1.0 / hertz;
+        File logFile = new File(outputPath + "/" + testName + "-" + iteration + ".txt");
         try {
             psrecordProcess = new ProcessBuilder(
-                    "nice", "-n", "20",
                     psrecordPath, String.valueOf(targetPid),
                     "--interval", "" + rate,
-                    "--log", outputPath + "/" + testName + "-" + iteration + ".txt"
+                    "--log", logFile.getAbsolutePath()
             ).start();
-            // FIXME: for endpoints with low latency have to wait until the measurements have started
+            waitForFileCreation(logFile);
         } catch (IOException e) {
             throw new RuntimeException("psrecord was not found", e);
         }
     }
 
+    private static void waitForFileCreation(File file) {
+        while (true) {
+            // if log file has been created and something has been written psrecord is ready -> request can be sent now
+            if (file.exists() && file.length() > 0) {
+                return;
+            }
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Interrupted while waiting for psrecord to initialize", e);
+            }
+        }
+    }
+
     public static void stop() {
+        // Wait for 200 millis so, psrecords shutdown doesn't collide with application measurements
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {throw new RuntimeException(e);}
         if (psrecordProcess != null && psrecordProcess.isAlive()) {
             psrecordProcess.destroy();
         }

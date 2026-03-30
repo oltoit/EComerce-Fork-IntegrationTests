@@ -1,6 +1,6 @@
 package com.github.damiox.ecommerce.api.controller.performance.resourceUtilization;
 
-import com.github.damiox.ecommerce.api.controller.performance.resourceUtilization.tests.CategoryResourceTest;
+import com.github.damiox.ecommerce.api.controller.performance.resourceUtilization.tests.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -13,10 +13,10 @@ import java.time.format.DateTimeFormatter;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     CategoryResourceTest.class,
-//    ProductResourceTest.class,
-//    CategorySubcategoriesResourceTest.class,
-//    CategoryProductsResourceTest.class,
-//    AuthenticationResourceTest.class
+    ProductResourceTest.class,
+    CategorySubcategoriesResourceTest.class,
+    CategoryProductsResourceTest.class,
+    AuthenticationResourceTest.class
 })
 public class ResourceTestCoordinator {
     public final static long TARGET_PID = findTargetPid();
