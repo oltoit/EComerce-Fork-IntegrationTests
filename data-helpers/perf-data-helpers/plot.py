@@ -63,21 +63,23 @@ def plot_mixed(df: pd.DataFrame, output_dir: Path, name: str):
 
     fig, ax_cpu = plt.subplots(figsize=(10, 5))
 
+    cpu_max = df["CPU (%)"].max()
     ax_cpu.plot(df["Elapsed time"], df["CPU (%)"], color="steelblue", label="CPU (%)")
     ax_cpu.set_xlabel("Elapsed time (s)")
     ax_cpu.set_ylabel("CPU (%)", color="steelblue")
     ax_cpu.tick_params(axis="y", labelcolor="steelblue")
+    ax_cpu.set_ylim(bottom=0, top=cpu_max * 1.2)
 
     ram_max = df["Real (MB)"].max()
     ax_ram = ax_cpu.twinx()
     ax_ram.plot(df["Elapsed time"], df["Real (MB)"], color="tomato", label="Real RAM (MB)")
     ax_ram.set_ylabel("Real RAM (MB)", color="tomato")
-    ax_ram.set_ylim(bottom=0, top=ram_max * 1.3)
     ax_ram.tick_params(axis="y", labelcolor="tomato")
+    ax_ram.set_ylim(bottom=0, top=ram_max * 1.2)
 
     lines_cpu, labels_cpu = ax_cpu.get_legend_handles_labels()
     lines_ram, labels_ram = ax_ram.get_legend_handles_labels()
-    ax_cpu.legend(lines_cpu + lines_ram, labels_cpu + labels_ram, loc="upper left", bbox_to_anchor=(0.0, 1.15), ncol=2)
+    ax_cpu.legend(lines_cpu + lines_ram, labels_cpu + labels_ram, loc="upper left")
 
     ax_cpu.set_title(f"{titleName} – CPU & RAM Usage")
     ax_cpu.grid(True, alpha=0.3)

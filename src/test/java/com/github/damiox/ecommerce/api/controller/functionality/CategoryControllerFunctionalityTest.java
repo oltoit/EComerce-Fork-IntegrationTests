@@ -68,6 +68,16 @@ public class CategoryControllerFunctionalityTest extends IntegrationTestBase {
     public void createCategoryEmptyName() {
         ResponseEntity<Map> response = createCategory(loginWithHeaders(admin), "");
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        assertThat(categoryUtils.getCategoryCount()).isEqualTo(0L);
+    }
+
+    @Test
+    public void createCategoryNameNull() {
+        ResponseEntity<Map> response = createCategory(loginWithHeaders(admin), null);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        assertThat(categoryUtils.getCategoryCount()).isEqualTo(0L);
     }
 
     // Update category
@@ -99,6 +109,16 @@ public class CategoryControllerFunctionalityTest extends IntegrationTestBase {
         assertThat(fromDb.get("name")).isEqualTo("original-category");
     }
 
+    @Test
+    public void updateCategoryNameNull() {
+        long id = categoryUtils.createCategory("original-category");
+
+        ResponseEntity<Map> response = updateCategory(loginWithHeaders(admin), id, null);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        Map<String, Object> fromDb = categoryUtils.getCategoryAsMap(id);
+        assertThat(fromDb.get("name")).isEqualTo("original-category");
+    }
 
     // Delete category
     @Test

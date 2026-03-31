@@ -26,6 +26,11 @@ public class ProductUtils extends AbstractDBAccess {
         return new ProductDto((String) map.get("name"), "EUR", (double) map.get("price"));
     }
 
+    public long getProductCount() throws SQLException {
+        String query = "SELECT COUNT(*) FROM app_product";
+        return jdbcTemplate.queryForObject(query, Long.class);
+    }
+
     public long createProduct(ProductDto product, long userId) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 

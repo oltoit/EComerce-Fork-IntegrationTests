@@ -1,10 +1,7 @@
 package com.github.damiox.ecommerce.api.controller.performance.resourceUtilization;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.concurrent.TimeUnit;
 
 /// Class running in separate thread that measures resource utilization.
 /// measures cpu-utilization in % and ram-usage in MB.

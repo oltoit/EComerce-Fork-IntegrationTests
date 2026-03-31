@@ -6,6 +6,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
 
@@ -19,6 +20,10 @@ public class CategoryUtils extends AbstractDBAccess {
 
     public Map<String, Object> getCategoryAsMap(long id) {
         return jdbcTemplate.queryForMap("SELECT * FROM app_category WHERE id = " + id);
+    }
+
+    public long getCategoryCount() {
+        return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM app_category", Long.class);
     }
 
     public long createCategory(String name) {
