@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter;
     CategorySubcategoriesPerfTimeTest.class,
     CategoryProductsPerfTimeTest.class,
 })
-public class TestCoordinator {
+public class TimeTestCoordinator {
     public static final String CSV_PATH = createCsvPath();
 
     private static String createCsvPath() {
