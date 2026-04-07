@@ -31,8 +31,17 @@ public class AuthenticationControllerFunctionalityTest extends IntegrationTestBa
     }
 
     @Test
-    public void loginWrongCredentials() {
+    public void loginWrongPassword() {
         CredentialsDto credentials = new CredentialsDto("admin", "armin");
+        HttpEntity entity = new HttpEntity(credentials, null);
+
+        ResponseEntity<String> response = restTemplate.exchange(baseUrl, HttpMethod.POST, entity, String.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void loginWrongUsername() {
+        CredentialsDto credentials = new CredentialsDto("armin", "admin");
         HttpEntity entity = new HttpEntity(credentials, null);
 
         ResponseEntity<String> response = restTemplate.exchange(baseUrl, HttpMethod.POST, entity, String.class);

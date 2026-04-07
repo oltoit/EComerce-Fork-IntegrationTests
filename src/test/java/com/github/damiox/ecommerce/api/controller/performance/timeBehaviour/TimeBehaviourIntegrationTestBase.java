@@ -5,5 +5,5 @@ import org.junit.Rule;
 
 public class TimeBehaviourIntegrationTestBase extends IntegrationTestBase {
     @Rule
-    public TimeTrackerRule timeTrackerRule = new TimeTrackerRule(10, TestCoordinator.CSV_PATH);
+    public TimeTrackerRule timeTrackerRule = new TimeTrackerRule(10, TimeTestCoordinator.CSV_PATH);
 }

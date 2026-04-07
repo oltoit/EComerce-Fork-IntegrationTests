@@ -7,6 +7,7 @@ import com.github.damiox.ecommerce.api.controller.objects.ProductDto;
 import com.github.damiox.ecommerce.api.controller.objects.Role;
 import com.github.damiox.ecommerce.api.controller.objects.User;
 import com.github.damiox.ecommerce.api.controller.utils.DBAccess;
+import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -42,7 +43,7 @@ public abstract class IntegrationTestBase {
         restTemplate = new RestTemplate();
         restTemplate.setErrorHandler(new DefaultResponseErrorHandler(){
             @Override
-            public boolean hasError(HttpStatus statusCode) {
+            public boolean hasError(@NotNull HttpStatusCode statusCode) {
                 return false;
             }
         });
