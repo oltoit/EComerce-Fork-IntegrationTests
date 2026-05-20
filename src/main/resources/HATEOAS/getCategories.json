@@ -1,0 +1,15 @@
+[
+  {
+    "name": "test-category",
+    "links": [
+      {
+        "rel": "self",
+        "href": "http://localhost:8080/categories/100"
+      },
+      {
+        "rel": "subcategories",
+        "href": "http://localhost:8080/categories/100/subcategories"
+      }
+    ]
+  }
+]

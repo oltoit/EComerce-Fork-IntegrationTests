@@ -1,5 +1,7 @@
 package com.github.damiox.ecommerce.api.controller.functionality;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.damiox.ecommerce.api.controller.IntegrationTestBase;
 import com.github.damiox.ecommerce.api.controller.objects.CategoryDto;
 import com.github.damiox.ecommerce.api.controller.objects.ProductDto;
@@ -10,20 +12,23 @@ import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 /*
-Tests for the purposes of testing whether every endpoint sends a correct hateoas response.
+Tests to test whether every endpoint sends a correct hateoas response.
 Only Endpoints are tested that actually return a body.
 */
 
@@ -40,6 +45,42 @@ public class HateoasFunctionalityTest extends IntegrationTestBase {
     @Autowired
     private ProductCategoryUtils productCategoryUtils;
 
+    @Value("classpath:HATEOAS/getProducts.json")
+    private Resource getProductsResponse;
+
+    @Value("classpath:HATEOAS/getProduct.json")
+    private Resource getProductResponse;
+
+    @Value("classpath:HATEOAS/createProduct.json")
+    private Resource createProductResponse;
+
+    @Value("classpath:HATEOAS/updateProduct.json")
+    private Resource updateProductResponse;
+
+    @Value("classpath:HATEOAS/getCategories.json")
+    private Resource getCategoriesResponse;
+
+    @Value("classpath:HATEOAS/getCategory.json")
+    private Resource getCategoryResponse;
+
+    @Value("classpath:HATEOAS/createCategory.json")
+    private Resource createCategoryResponse;
+
+    @Value("classpath:HATEOAS/updatedCategory.json")
+    private Resource updateCategoryResponse;
+
+    @Value("classpath:HATEOAS/getSubcategories.json")
+    private Resource getSubcategoriesResponse;
+
+    @Value("classpath:HATEOAS/addSubcategory.json")
+    private Resource addSubcategoryResponse;
+
+    @Value("classpath:HATEOAS/getCategoryProducts.json")
+    private Resource getCategoryProductsResponse;
+
+    @Value("classpath:HATEOAS/addCategoryProduct.json")
+    private Resource addCategoryProductResponse;
+
     @Before
     public void init() {
         productsBaseUrl = productsUrl();
@@ -48,52 +89,45 @@ public class HateoasFunctionalityTest extends IntegrationTestBase {
 
     // ProductController Tests
     @Test
-    public void getProducts() {
-        long id = productUtils.createProduct(defaultProduct, user1.id);
-        String url = productUrl((int) id);
+    public void getProducts() throws IOException {
+        productUtils.createProduct(defaultProduct, user1.id);
 
-        ResponseEntity<Map> response = restTemplate.exchange(
+        ResponseEntity<String> response = restTemplate.exchange(
                 productsBaseUrl, HttpMethod.GET,
-                new HttpEntity<>(loginWithHeaders(user1)), Map.class
+                new HttpEntity<>(loginWithHeaders(user1)), String.class
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).containsKeys("_links", "_embedded");
-        assertThat((Map) response.getBody().get("_links")).containsKey("self");
+        JSONAssert.assertEquals(getProductsResponse.getContentAsString(Charset.defaultCharset()), response.getBody(), false);
     }
 
     @Test
-    public void getProduct() {
+    public void getProduct() throws IOException {
         long id = productUtils.createProduct(defaultProduct, user1.id);
         String url = productUrl((int) id);
 
-        ResponseEntity<Map> response = restTemplate.exchange(
+        ResponseEntity<String> response = restTemplate.exchange(
                 url, HttpMethod.GET,
-                new HttpEntity<>(loginWithHeaders(user1)), Map.class
+                new HttpEntity<>(loginWithHeaders(user1)), String.class
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        Map links = (Map) response.getBody().get("_links");
-        assertThat((String) ((Map) links.get("self")).get("href")).isEqualTo(url);
+        JSONAssert.assertEquals(getProductResponse.getContentAsString(Charset.defaultCharset()), response.getBody(), false);
     }
 
     @Test
-    public void createProduct() {
-        ResponseEntity<Map> response = restTemplate.exchange(
+    public void createProduct() throws IOException {
+        ResponseEntity<String> response = restTemplate.exchange(
                 productsBaseUrl, HttpMethod.POST,
-                new HttpEntity<>(defaultProduct, loginWithHeaders(user1)), Map.class
+                new HttpEntity<>(defaultProduct, loginWithHeaders(user1)), String.class
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-        Map links = (Map) response.getBody().get("_links");
-        assertThat(links).containsKey("self");
-
-        String selfHref = (String) ((Map) links.get("self")).get("href");
-        assertThat(selfHref).contains("/products/");
+        JSONAssert.assertEquals(createProductResponse.getContentAsString(Charset.defaultCharset()), response.getBody(), false);
 
         // Test that href is valid
+        JsonNode root = new ObjectMapper().readTree(response.getBody());
+        String selfHref = root.path("_links").path("self").path("href").asText();
         ResponseEntity<Map> getResponse = restTemplate.exchange(
                 selfHref, HttpMethod.GET,
                 new HttpEntity<>(loginWithHeaders(user1)), Map.class
@@ -102,21 +136,20 @@ public class HateoasFunctionalityTest extends IntegrationTestBase {
     }
 
     @Test
-    public void updateProduct() {
+    public void updateProduct() throws IOException {
         long id = productUtils.createProduct(defaultProduct, user1.id);
 
-        ResponseEntity<Map> response = restTemplate.exchange(
+        ResponseEntity<String> response = restTemplate.exchange(
                 productsBaseUrl + "/" + id, HttpMethod.PUT,
-                new HttpEntity<>(new ProductDto("updated", "EUR", 12.00), loginWithHeaders(user1)), Map.class
+                new HttpEntity<>(new ProductDto("updated", "EUR", 12.00), loginWithHeaders(user1)), String.class
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        Map links = (Map) response.getBody().get("_links");
-        String selfHref = (String) ((Map) links.get("self")).get("href");
-        assertThat(links).containsKey("self");
+        JSONAssert.assertEquals(updateProductResponse.getContentAsString(Charset.defaultCharset()), response.getBody(), false);
 
         // Test that href is valid
+        JsonNode root = new ObjectMapper().readTree(response.getBody());
+        String selfHref = root.path("_links").path("self").path("href").asText();
         ResponseEntity<Map> getResponse = restTemplate.exchange(
                 selfHref, HttpMethod.GET,
                 new HttpEntity<>(loginWithHeaders(user1)), Map.class
@@ -127,55 +160,46 @@ public class HateoasFunctionalityTest extends IntegrationTestBase {
 
     // CategoryController Tests
     @Test
-    public void getCategories() {
+    public void getCategories() throws IOException {
         categoryUtils.createCategory("test-category");
 
         // Using List here turns _link into link for some reason
-        ResponseEntity<List> response = restTemplate.exchange(
+        ResponseEntity<String> response = restTemplate.exchange(
                 categoriesBaseUrl, HttpMethod.GET,
-                new HttpEntity<>(loginWithHeaders(user1)), List.class
+                new HttpEntity<>(loginWithHeaders(user1)), String.class
         );
 
-        Map<String, Object> map = (Map) response.getBody().get(0);
-
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(map).containsKeys("links");
-        assertThat((List) map.get("links")).isNotEmpty();
+        JSONAssert.assertEquals(getCategoriesResponse.getContentAsString(Charset.defaultCharset()), response.getBody(), false);
     }
 
     @Test
-    public void getCategory() {
+    public void getCategory() throws IOException {
         long id = categoryUtils.createCategory("test-category");
         String url = categoryUrl((int) id);
 
-        ResponseEntity<Map> response = restTemplate.exchange(
+        ResponseEntity<String> response = restTemplate.exchange(
                 url , HttpMethod.GET,
-                new HttpEntity<>(loginWithHeaders(user1)), Map.class
+                new HttpEntity<>(loginWithHeaders(user1)), String.class
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
-        Map links = (Map) response.getBody().get("_links");
-        assertThat((String) ((Map) links.get("self")).get("href")).isEqualTo(url);
-
+        JSONAssert.assertEquals(getCategoryResponse.getContentAsString(Charset.defaultCharset()), response.getBody(), false);
     }
 
     @Test
-    public void createCategory() {
-        ResponseEntity<Map> response = restTemplate.exchange(
+    public void createCategory() throws IOException {
+        ResponseEntity<String> response = restTemplate.exchange(
                 categoriesBaseUrl, HttpMethod.POST,
-                new HttpEntity<>(new CategoryDto("new-category"), loginWithHeaders(admin)), Map.class
+                new HttpEntity<>(new CategoryDto("new-category"), loginWithHeaders(admin)), String.class
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-        Map links = (Map) response.getBody().get("_links");
-        assertThat(links).containsKey("self");
-
-        String selfHref = (String) ((Map) links.get("self")).get("href");
-        assertThat(selfHref).contains("/categories/");
+        JSONAssert.assertEquals(createCategoryResponse.getContentAsString(Charset.defaultCharset()), response.getBody(), false);
 
         // Test that href is valid
+        JsonNode root = new ObjectMapper().readTree(response.getBody());
+        String selfHref = root.path("_links").path("self").path("href").asText();
         ResponseEntity<Map> getResponse = restTemplate.exchange(
                 selfHref, HttpMethod.GET,
                 new HttpEntity<>(loginWithHeaders(user1)), Map.class
@@ -184,68 +208,78 @@ public class HateoasFunctionalityTest extends IntegrationTestBase {
     }
 
     @Test
-    public void updateCategory() {
+    public void updateCategory() throws IOException {
         long id = categoryUtils.createCategory("original-category");
         String url = categoryUrl((int) id);
 
-        ResponseEntity<Map> response = restTemplate.exchange(
+        ResponseEntity<String> response = restTemplate.exchange(
                 url, HttpMethod.PUT,
-                new HttpEntity<>(new CategoryDto("updated-category"), loginWithHeaders(admin)), Map.class
+                new HttpEntity<>(new CategoryDto("updated-category"), loginWithHeaders(admin)), String.class
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        JSONAssert.assertEquals(updateCategoryResponse.getContentAsString(Charset.defaultCharset()), response.getBody(), false);
 
-        Map links = (Map) response.getBody().get("_links");
-        String selfHref = (String) ((Map) links.get("self")).get("href");
-        assertThat(selfHref).isEqualTo(url);
+        // Test that href is valid
+        JsonNode root = new ObjectMapper().readTree(response.getBody());
+        String selfHref = root.path("_links").path("self").path("href").asText();
+        ResponseEntity<Map> getResponse = restTemplate.exchange(
+                selfHref, HttpMethod.GET,
+                new HttpEntity<>(loginWithHeaders(user1)), Map.class
+        );
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
 
     // CategorySubcategoriesController Tests
     @Test
-    public void getSubcategories() {
+    public void getSubcategories() throws IOException {
         long parentId = categoryUtils.createCategory("parent");
-        long childId = categoryUtils.createSubcategory("child", parentId);
+        categoryUtils.createSubcategory("child", parentId);
 
-        ResponseEntity<List> response = restTemplate.exchange(
+        ResponseEntity<String> response = restTemplate.exchange(
                 subcategoriesUrl(parentId), HttpMethod.GET,
-                new HttpEntity<>(loginWithHeaders(user1)), List.class
+                new HttpEntity<>(loginWithHeaders(user1)), String.class
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotEmpty();
-
-        Map firstItem = (Map) response.getBody().get(0);
-        assertThat(firstItem).containsKey("links");
-        assertThat((List) firstItem.get("links")).isNotEmpty();
+        JSONAssert.assertEquals(getSubcategoriesResponse.getContentAsString(Charset.defaultCharset()), response.getBody(), false);
 
         // check that href is valid
-        String subcategoryHref = ((List) firstItem.get("links")).stream().filter(e -> ((Map) e).get("rel").equals("self")).map(e -> ((Map) e).get("href")).findFirst().get().toString();
-        assertThat(subcategoryHref).isEqualTo(categoryUrl((int) childId));
+        JsonNode root = new ObjectMapper().readTree(response.getBody()).get(0);
+        String selfHref = null;
+
+        for (JsonNode link: root.path("links")) {
+            if (link.path("rel").asText().equals("self")) {
+                selfHref = link.path("href").asText();
+                break;
+            }
+        }
+
+        ResponseEntity<Map> getResponse = restTemplate.exchange(
+                selfHref, HttpMethod.GET,
+                new HttpEntity<>(loginWithHeaders(user1)), Map.class
+        );
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
-    public void addSubcategory() {
+    public void addSubcategory() throws IOException {
         long parentId = categoryUtils.createCategory("parent");
         long childId = categoryUtils.createCategory("child");
 
-        ResponseEntity<Map> response = restTemplate.exchange(
+        ResponseEntity<String> response = restTemplate.exchange(
                 subcategoryUrl(parentId, childId), HttpMethod.POST,
-                new HttpEntity<>(loginWithHeaders(admin)), Map.class
+                new HttpEntity<>(loginWithHeaders(admin)), String.class
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-
-        LinkedHashMap links = (LinkedHashMap) response.getBody().get("_links");
-        assertThat(links).isNotEmpty();
-
-        assertThat(links.size()).isEqualTo(2);
-        assertThat(links.get("self")).isNotNull();
-        assertThat(links.get("subcategories")).isNotNull();
+        JSONAssert.assertEquals(addSubcategoryResponse.getContentAsString(Charset.defaultCharset()), response.getBody(), false);
 
         // test that both hrefs are valid
-        String selfLink = ((Map) links.get("self")).get("href").toString();
-        String subcategoryLink = ((Map) links.get("subcategories")).get("href").toString();
+        JsonNode root = new ObjectMapper().readTree(response.getBody());
+        String selfLink = root.path("_links").path("self").path("href").asText();
+        String subcategoryLink = root.path("_links").path("subcategories").path("href").asText();
 
         assertThat(selfLink).isEqualTo(categoryUrl((int) parentId));
         assertThat(subcategoryLink).isEqualTo(subcategoriesUrl(parentId));
@@ -254,38 +288,42 @@ public class HateoasFunctionalityTest extends IntegrationTestBase {
 
     // CategoryProductsController Tests
     @Test
-    public void getCategoryProducts() {
+    public void getCategoryProducts() throws IOException {
         long productId = productUtils.createProduct(defaultProduct, user1.id);
         long categoryId = categoryUtils.createCategory("test-category");
         productCategoryUtils.addProductToCategory(productId, categoryId);
 
-        ResponseEntity<Map> response = restTemplate.exchange(
+        ResponseEntity<String> response = restTemplate.exchange(
                 categoryProductsUrl(categoryId), HttpMethod.GET,
-                new HttpEntity<>(loginWithHeaders(user1)), Map.class
+                new HttpEntity<>(loginWithHeaders(user1)), String.class
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        JSONAssert.assertEquals(getCategoryProductsResponse.getContentAsString(Charset.defaultCharset()), response.getBody(), false);
 
-        Map firstItem = response.getBody();
-        assertThat(firstItem).containsKey("_links");
-        assertThat(firstItem.get("_links")).isNotNull();
+        // Test that self href is valid
+        JsonNode root = new ObjectMapper().readTree(response.getBody());
+        String selfHref = root.path("_embedded").path("productResourceList").path(0).path("_links").path("self").path("href").asText();
+        assertThat(selfHref).isEqualTo(productUrl((int) productId));
     }
 
     @Test
-    public void addCategoryProduct() {
+    public void addCategoryProduct() throws IOException {
         long productId = productUtils.createProduct(defaultProduct, user1.id);
         long categoryId = categoryUtils.createCategory("test-category");
         String url = productUrl((int) productId);
 
-        ResponseEntity<Map> response = restTemplate.exchange(
+        ResponseEntity<String> response = restTemplate.exchange(
                 categoryProductUrl(categoryId, productId), HttpMethod.POST,
-                new HttpEntity<>(loginWithHeaders(user1)), Map.class
+                new HttpEntity<>(loginWithHeaders(user1)), String.class
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        JSONAssert.assertEquals(addCategoryProductResponse.getContentAsString(Charset.defaultCharset()), response.getBody(), false);
 
-        LinkedHashMap links = (LinkedHashMap) response.getBody().get("_links");
-        assertThat(links).isNotEmpty();
-        assertThat((String) ((Map) links.get("self")).get("href")).isEqualTo(url);
+        // Test that self href is valid
+        JsonNode root = new ObjectMapper().readTree(response.getBody());
+        String selfHref = root.path("_links").path("self").path("href").asText();
+        assertThat(selfHref).isEqualTo(productUrl((int) productId));
     }
 }

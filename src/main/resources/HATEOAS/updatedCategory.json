@@ -1,0 +1,11 @@
+{
+  "name": "updated-category",
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/categories/100"
+    },
+    "subcategories": {
+      "href": "http://localhost:8080/categories/100/subcategories"
+    }
+  }
+}

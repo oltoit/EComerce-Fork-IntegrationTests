@@ -1,0 +1,11 @@
+{
+  "name": "test",
+  "currency": "EUR",
+  "price": 10.0,
+  "owner": "user1",
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/products/100"
+    }
+  }
+}

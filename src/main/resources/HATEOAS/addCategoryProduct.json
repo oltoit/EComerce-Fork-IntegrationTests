@@ -1,0 +1,27 @@
+{
+  "name": "test",
+  "currency": "EUR",
+  "price": 10.0,
+  "categories": [
+    {
+      "name": "test-category",
+      "_links": {
+        "self": {
+          "href": "http://localhost:8080/categories/101"
+        },
+        "subcategories": {
+          "href": "http://localhost:8080/categories/101/subcategories"
+        },
+        "products": {
+          "href": "http://localhost:8080/categories/101/products"
+        }
+      }
+    }
+  ],
+  "owner": "user1",
+  "_links": {
+    "self": {
+      "href": "http://localhost:8080/products/100"
+    }
+  }
+}
