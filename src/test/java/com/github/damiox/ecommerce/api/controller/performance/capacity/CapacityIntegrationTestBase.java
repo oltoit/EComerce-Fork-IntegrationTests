@@ -7,6 +7,8 @@ import static com.github.damiox.ecommerce.api.controller.performance.capacity.Ca
 import static com.github.damiox.ecommerce.api.controller.performance.capacity.CapacityTestCoordinator.TARGET_PID;
 
 public class CapacityIntegrationTestBase extends IntegrationTestBase {
+    public static final int ITERATIONS = 10;
+
     @Rule
-    public CapacityTrackerRule capacityTrackerRule = new CapacityTrackerRule(1, TARGET_PID, RESULT_PATH);
+    public CapacityTrackerRule capacityTrackerRule = new CapacityTrackerRule(ITERATIONS, TARGET_PID, RESULT_PATH);
 }

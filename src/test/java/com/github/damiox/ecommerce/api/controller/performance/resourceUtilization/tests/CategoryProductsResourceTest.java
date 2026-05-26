@@ -1,7 +1,6 @@
 package com.github.damiox.ecommerce.api.controller.performance.resourceUtilization.tests;
 
 import com.github.damiox.ecommerce.api.controller.objects.ProductDto;
-import com.github.damiox.ecommerce.api.controller.performance.resourceUtilization.ResourceSampler;
 import com.github.damiox.ecommerce.api.controller.performance.resourceUtilization.ResourceUtilizationIntegrationTestBase;
 import com.github.damiox.ecommerce.api.controller.utils.CategoryUtils;
 import com.github.damiox.ecommerce.api.controller.utils.ProductCategoryUtils;
@@ -37,9 +36,7 @@ public class CategoryProductsResourceTest extends ResourceUtilizationIntegration
         String url = categoryProductsUrl(categoryId);
         HttpEntity httpEntity = new HttpEntity(loginWithHeaders(user1));
 
-        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName(), 600);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
-        ResourceSampler.stop();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -56,9 +53,7 @@ public class CategoryProductsResourceTest extends ResourceUtilizationIntegration
         String url = categoryProductUrl(categoryId, productId);
         HttpEntity httpEntity = new HttpEntity(loginWithHeaders(user1));
 
-        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName(), 2400);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);
-        ResourceSampler.stop();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
@@ -76,9 +71,7 @@ public class CategoryProductsResourceTest extends ResourceUtilizationIntegration
         String url = categoryProductUrl(categoryId, productId);
         HttpEntity httpEntity = new HttpEntity(loginWithHeaders(user1));
 
-        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName(), 2400);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.DELETE, httpEntity, String.class);
-        ResourceSampler.stop();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }

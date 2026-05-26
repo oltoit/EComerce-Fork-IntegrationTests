@@ -36,15 +36,15 @@ public class ResourceTestCoordinator {
     private static long findTargetPid() {
         try {
             int port = 8080;
-            ProcessBuilder pb = new ProcessBuilder("zsh", "-lc", "lsof -ti tcp:" + port);
+            ProcessBuilder pb = new ProcessBuilder("zsh", "-lc", "lsof -nP -t -iTCP:" + port + " -sTCP:LISTEN");
             Process p = pb.start();
 
-            try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(p.getInputStream()))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
                 String line = reader.readLine();
                 if (line == null || line.isEmpty()) {
                     throw new RuntimeException("No process on port " + port);
                 }
+                System.out.println("\u001B[36mFound PID: " + line.trim() + "\u001B[0m");
                 return Long.parseLong(line.trim());
             }
         } catch (RuntimeException e) {

@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
-import re
-import sys
 import json
 import pathlib
 import pyjson5
+import re
+import sys
+
+# Written by Claude Sonnet 4.6
 
 def find_stats_js(folder: pathlib.Path) -> pathlib.Path:
     matches = list(folder.glob("*/js/stats.js"))

@@ -1,7 +1,9 @@
 package com.github.damiox.ecommerce.api.controller.performance.capacity.tests;
 
-import io.gatling.javaapi.core.*;
-import io.gatling.javaapi.http.*;
+import io.gatling.javaapi.core.ChainBuilder;
+import io.gatling.javaapi.core.ScenarioBuilder;
+import io.gatling.javaapi.core.Simulation;
+import io.gatling.javaapi.http.HttpProtocolBuilder;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -12,8 +14,13 @@ import java.util.stream.Stream;
 
 import static com.github.damiox.ecommerce.api.controller.performance.capacity.tests.GatlingCallerTest.LOADTEST_PASSWORD;
 import static com.github.damiox.ecommerce.api.controller.performance.capacity.tests.GatlingCallerTest.LOADTEST_USERNAME;
-import static io.gatling.javaapi.core.CoreDsl.*;
-import static io.gatling.javaapi.http.HttpDsl.*;
+import static io.gatling.javaapi.core.CoreDsl.StringBody;
+import static io.gatling.javaapi.core.CoreDsl.exec;
+import static io.gatling.javaapi.core.CoreDsl.jsonPath;
+import static io.gatling.javaapi.core.CoreDsl.rampUsers;
+import static io.gatling.javaapi.core.CoreDsl.scenario;
+import static io.gatling.javaapi.http.HttpDsl.http;
+import static io.gatling.javaapi.http.HttpDsl.status;
 
 public class ECommerceSimulation extends Simulation {
     private static final String BASE_URL = System.getProperty("baseUrl","http://localhost:8080");

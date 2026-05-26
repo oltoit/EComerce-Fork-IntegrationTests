@@ -1,17 +1,18 @@
 package com.github.damiox.ecommerce.api.controller.performance.capacity;
 
-import org.junit.runners.Suite;
-
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class CapacitySampler {
 
-    private static final String psrecordPath = findPsRecord();
+    private static final String MEASURING_PATH = System.getProperty("user.dir") + "/data-helpers/gatling-helpers/perf-measure.py";
 
-    private static Process psrecordProcess;
+    private static BufferedReader measurementReader;
+    private static Process process;
     private static long targetPid = - 1;
     private static String outputPath;
     private static int iteration = 0;
@@ -32,61 +33,60 @@ public class CapacitySampler {
         iteration = i;
     }
 
-    public static void startWholeRun(String runName, int hertz) {
-        double rate = 1.0 / hertz;
-        File logFile = new File(outputPath + "/" + runName + "-T" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH-mm-ss")) + ".txt");
-        // TODO: consider removing this
+    public static void startWholeRun(String runName) {
+        File logFile = new File(outputPath + "/" + runName + iteration + "-T" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH-mm-ss")) + ".csv");
         logFile.getParentFile().mkdirs();
         try {
-            psrecordProcess = new ProcessBuilder(
-                    psrecordPath, String.valueOf(targetPid),
-                    "--interval", "" + rate,
-                    "--log", logFile.getAbsolutePath()
-            ).start();
-            waitForFileCreation(logFile);
+            process = new ProcessBuilder(
+                    "python3", MEASURING_PATH, String.valueOf(targetPid),
+                    "--output", logFile.getAbsolutePath()
+            )
+            .redirectError(ProcessBuilder.Redirect.INHERIT)
+            .start();
+
+            measurementReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+            waitForReadySignal();
         } catch (IOException e) {
-            throw new RuntimeException("psrecord was not found", e);
+            throw new RuntimeException("measuring utility was not found", e);
         }
     }
 
-    private static void waitForFileCreation(File file) {
-        while (true) {
-            // if log file has been created and something has been written psrecord is ready -> request can be sent now
-            if (file.exists() && file.length() > 0) {
-                return;
+    private static void waitForReadySignal() {
+        try {
+            String line;
+            while ((line = measurementReader.readLine()) != null) {
+                if ("READY".equals(line.trim())) {
+                    return;
+                }
             }
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeException("Interrupted while waiting for psrecord to initialize", e);
-            }
+            throw new RuntimeException("Measurement process terminated before READY signal");
+        } catch (IOException e) {
+            throw new RuntimeException("Failed while waiting for READY signal", e);
         }
     }
 
     public static void stop() {
-        // Wait for 200 millis so, psrecords shutdown doesn't collide with application measurements
+        if (process == null) return;
         try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {throw new RuntimeException(e);}
-        if (psrecordProcess != null && psrecordProcess.isAlive()) {
-            psrecordProcess.destroy();
-        }
-    }
-
-    private static String findPsRecord() {
-        String[] candidates = {
-                "/usr/local/bin/psrecord",
-                "/opt/homebrew/bin/psrecord",
-                System.getProperty("user.home") + "/Library/Python/3.9/bin/psrecord",
-                System.getProperty("user.home") + "/.local/bin/psrecord"
-        };
-
-        for (String candidate : candidates) {
-            if (new File(candidate).exists()) {
-                return candidate;
+            if (process.isAlive()) {
+                process.destroy();
+                if (!process.waitFor(5, java.util.concurrent.TimeUnit.SECONDS)) {
+                    process.destroyForcibly();
+                    process.waitFor();
+                }
             }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Interrupted while stopping measurement process", e);
+        } finally {
+            try {
+                if (measurementReader != null) {
+                    measurementReader.close();
+                }
+            } catch (IOException ignored) {}
+            measurementReader = null;
+            process = null;
         }
-        throw new RuntimeException("psrecord was not found - is it installed?");
     }
 }

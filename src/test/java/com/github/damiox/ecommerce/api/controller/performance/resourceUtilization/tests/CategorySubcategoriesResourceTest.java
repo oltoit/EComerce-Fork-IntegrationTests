@@ -1,6 +1,5 @@
 package com.github.damiox.ecommerce.api.controller.performance.resourceUtilization.tests;
 
-import com.github.damiox.ecommerce.api.controller.performance.resourceUtilization.ResourceSampler;
 import com.github.damiox.ecommerce.api.controller.performance.resourceUtilization.ResourceUtilizationIntegrationTestBase;
 import com.github.damiox.ecommerce.api.controller.utils.CategoryUtils;
 import org.junit.FixMethodOrder;
@@ -31,9 +30,7 @@ public class CategorySubcategoriesResourceTest extends ResourceUtilizationIntegr
         String subcategoriesUrl = subcategoriesUrl(parentId);
         HttpEntity httpEntity = new HttpEntity<>(loginWithHeaders(user1));
 
-        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName(), 600);
         ResponseEntity<String> response = restTemplate.exchange(subcategoriesUrl, HttpMethod.GET, httpEntity, String.class);
-        ResourceSampler.stop();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -50,9 +47,7 @@ public class CategorySubcategoriesResourceTest extends ResourceUtilizationIntegr
         String subcategoryUrl = subcategoryUrl(parentId, childId);
         HttpEntity httpEntity = new HttpEntity(loginWithHeaders(admin));
 
-        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName(), 2400);
         ResponseEntity<String> response = restTemplate.exchange(subcategoryUrl, HttpMethod.POST, httpEntity, String.class);
-        ResourceSampler.stop();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
@@ -69,9 +64,7 @@ public class CategorySubcategoriesResourceTest extends ResourceUtilizationIntegr
         String subcategoryUrl = subcategoryUrl(parentId, childId);
         HttpEntity httpEntity = new HttpEntity(loginWithHeaders(admin));
 
-        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName(), 2400);
         ResponseEntity<String> response = restTemplate.exchange(subcategoryUrl, HttpMethod.DELETE, httpEntity, String.class);
-        ResourceSampler.stop();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }

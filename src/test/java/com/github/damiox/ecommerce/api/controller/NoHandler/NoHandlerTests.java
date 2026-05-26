@@ -2,7 +2,9 @@ package com.github.damiox.ecommerce.api.controller.NoHandler;
 
 import com.github.damiox.ecommerce.api.controller.IntegrationTestBase;
 import org.junit.Test;
-import org.springframework.http.*;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

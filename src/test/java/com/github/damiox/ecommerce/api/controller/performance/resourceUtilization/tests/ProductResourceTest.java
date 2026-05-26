@@ -1,7 +1,6 @@
 package com.github.damiox.ecommerce.api.controller.performance.resourceUtilization.tests;
 
 import com.github.damiox.ecommerce.api.controller.objects.ProductDto;
-import com.github.damiox.ecommerce.api.controller.performance.resourceUtilization.ResourceSampler;
 import com.github.damiox.ecommerce.api.controller.performance.resourceUtilization.ResourceUtilizationIntegrationTestBase;
 import com.github.damiox.ecommerce.api.controller.utils.ProductUtils;
 import org.junit.FixMethodOrder;
@@ -30,9 +29,7 @@ public class ProductResourceTest extends ResourceUtilizationIntegrationTestBase 
         HttpHeaders headers = loginWithHeaders(user1);
         HttpEntity entity = new HttpEntity(headers);
 
-        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName(), 600);
         ResponseEntity<String> response = restTemplate.exchange(baseUrl, HttpMethod.GET, entity, String.class);
-        ResourceSampler.stop();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -48,9 +45,7 @@ public class ProductResourceTest extends ResourceUtilizationIntegrationTestBase 
         HttpHeaders headers = loginWithHeaders(user1);
         HttpEntity entity = new HttpEntity(headers);
 
-        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName(), 2400);
         ResponseEntity<String> response = restTemplate.exchange(baseUrl, HttpMethod.GET, entity, String.class);
-        ResourceSampler.stop();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -62,9 +57,7 @@ public class ProductResourceTest extends ResourceUtilizationIntegrationTestBase 
         HttpHeaders headers = loginWithHeaders(user1);
         HttpEntity httpEntity = new HttpEntity(product, headers);
 
-        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName(), 2400);
         ResponseEntity<Map> response = restTemplate.exchange(baseUrl, HttpMethod.POST, httpEntity, Map.class);
-        ResourceSampler.stop();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
@@ -81,9 +74,7 @@ public class ProductResourceTest extends ResourceUtilizationIntegrationTestBase 
         HttpHeaders headers = loginWithHeaders(user1);
         HttpEntity httpEntity = new HttpEntity(product, headers);
 
-        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName(), 2400);
         ResponseEntity<Map> response = restTemplate.exchange(baseUrl, HttpMethod.PUT, httpEntity, Map.class);
-        ResourceSampler.stop();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -99,9 +90,7 @@ public class ProductResourceTest extends ResourceUtilizationIntegrationTestBase 
         HttpHeaders headers = loginWithHeaders(user1);
         HttpEntity httpEntity = new HttpEntity(headers);
 
-        ResourceSampler.start(Thread.currentThread().getStackTrace()[1].getMethodName(), 2400);
         ResponseEntity<Map> response = restTemplate.exchange(baseUrl, HttpMethod.DELETE, httpEntity, Map.class);
-        ResourceSampler.stop();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }

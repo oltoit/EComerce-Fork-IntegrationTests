@@ -18,10 +18,12 @@ public class ResourceTrackerRule implements TestRule {
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
+                ResourceSampler.start(description.getMethodName());
                 for (int i = 0; i < repetitions; i++) {
-                    ResourceSampler.setIteration(i);
+                    System.out.println("Iteration: " + i);
                     base.evaluate();
                 }
+                ResourceSampler.stop();
             }
         };
     }

@@ -18,10 +18,10 @@ public class CapacityTrackerRule implements TestRule {
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
-            for (int i = 0; i < iterations; i++) {
-                CapacitySampler.setIteration(i);
-                base.evaluate();
-            }
+                for (int i = 0; i < iterations; i++) {
+                    CapacitySampler.setIteration(i);
+                    base.evaluate();
+                }
             }
         };
     }

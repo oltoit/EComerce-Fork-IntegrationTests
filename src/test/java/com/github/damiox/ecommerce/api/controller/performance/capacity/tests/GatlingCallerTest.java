@@ -6,9 +6,10 @@ import com.github.damiox.ecommerce.api.controller.objects.User;
 import com.github.damiox.ecommerce.api.controller.performance.capacity.CapacityIntegrationTestBase;
 import com.github.damiox.ecommerce.api.controller.performance.capacity.CapacitySampler;
 import com.github.damiox.ecommerce.api.controller.performance.capacity.CapacityTestCoordinator;
-import com.github.damiox.ecommerce.api.controller.utils.*;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import com.github.damiox.ecommerce.api.controller.utils.CategoryUtils;
+import com.github.damiox.ecommerce.api.controller.utils.ProductCategoryUtils;
+import com.github.damiox.ecommerce.api.controller.utils.ProductUtils;
+import com.github.damiox.ecommerce.api.controller.utils.UserUtils;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -35,24 +36,13 @@ public class GatlingCallerTest extends CapacityIntegrationTestBase {
     @Autowired
     private ProductCategoryUtils productCategoryUtils;
 
-    @BeforeClass
-    public static void starteWholeRun(){
-        CapacitySampler.startWholeRun("whole-run", 2_400);
-    }
-
-    @AfterClass
-    public static void stopWholeRun() {
-        CapacitySampler.stop();
-    }
-
     @Test
     public void order1_gatlingTest_10Users() {
         int users = 10;
-        int ramp = 1;
+        int ramp = 0;
         String name = Thread.currentThread().getStackTrace()[1].getMethodName();
-        int hertz = 2_400;
 
-        executeTest(users, ramp, name, hertz);
+        executeTest(users, ramp, name);
     }
 
     @Test
@@ -60,9 +50,8 @@ public class GatlingCallerTest extends CapacityIntegrationTestBase {
         int users = 50;
         int ramp = 5;
         String name = Thread.currentThread().getStackTrace()[1].getMethodName();
-        int hertz = 2_400;
 
-        executeTest(users, ramp, name, hertz);
+        executeTest(users, ramp, name);
     }
 
     @Test
@@ -70,9 +59,8 @@ public class GatlingCallerTest extends CapacityIntegrationTestBase {
         int users = 100;
         int ramp = 10;
         String name = Thread.currentThread().getStackTrace()[1].getMethodName();
-        int hertz = 2_400;
 
-        executeTest(users, ramp, name, hertz);
+        executeTest(users, ramp, name);
     }
 
     @Test
@@ -80,9 +68,8 @@ public class GatlingCallerTest extends CapacityIntegrationTestBase {
         int users = 250;
         int ramp = 25;
         String name = Thread.currentThread().getStackTrace()[1].getMethodName();
-        int hertz = 2_400;
 
-        executeTest(users, ramp, name, hertz);
+        executeTest(users, ramp, name);
     }
 
     @Test
@@ -90,9 +77,8 @@ public class GatlingCallerTest extends CapacityIntegrationTestBase {
         int users = 500;
         int ramp = 50;
         String name = Thread.currentThread().getStackTrace()[1].getMethodName();
-        int hertz = 2_400;
 
-        executeTest(users, ramp, name, hertz);
+        executeTest(users, ramp, name);
     }
 
     @Test
@@ -100,18 +86,19 @@ public class GatlingCallerTest extends CapacityIntegrationTestBase {
         int users = 1_000;
         int ramp = 100;
         String name = Thread.currentThread().getStackTrace()[1].getMethodName();
-        int hertz = 2_400;
 
-        executeTest(users, ramp, name, hertz);
+        executeTest(users, ramp, name);
     }
 
-    private void executeTest(int users, int ramp, String name, int hertz) {
+    private void executeTest(int users, int ramp, String name) {
         prepareContext(users, ramp);
         new File(getGatlingOutputPath(name)).mkdirs();
 
         // execute test
         try {
+            CapacitySampler.startWholeRun(name);
             runGatling(name);
+            CapacitySampler.stop();
         } catch(IOException | InterruptedException e) {throw new RuntimeException(e);}
     }
 

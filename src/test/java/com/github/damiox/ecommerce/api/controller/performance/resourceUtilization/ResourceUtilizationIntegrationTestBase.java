@@ -7,6 +7,8 @@ import static com.github.damiox.ecommerce.api.controller.performance.resourceUti
 import static com.github.damiox.ecommerce.api.controller.performance.resourceUtilization.ResourceTestCoordinator.TEST_DIR;
 
 public class ResourceUtilizationIntegrationTestBase extends IntegrationTestBase {
+    public static final int REPETITIONS = 100;
+
     @Rule
-    public ResourceTrackerRule resourceTrackerRule = new ResourceTrackerRule(10, TARGET_PID, TEST_DIR);
+    public ResourceTrackerRule resourceTrackerRule = new ResourceTrackerRule(REPETITIONS, TARGET_PID, TEST_DIR);
 }
